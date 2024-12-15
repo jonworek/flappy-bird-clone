@@ -12,15 +12,17 @@ const preload = function () {
   this.load.image('sky', 'assets/sky.png');
   this.load.image('bird', 'assets/bird.png');
   this.load.image('cloud', 'assets/cloud.png');
+  this.load.image('pipe', 'assets/pipe.png');
 }
 
 let bird;
-let cloud;
+let cloud, cloud2;
+let pipes = [];
 
 const BIRD_VELOCITY = [10, 0];
 
 const birdFlap = function (event) {
-  bird.setVelocityY(-100);
+  bird.setVelocityY(-150);
 }
 
 //window.addEventListener('keydown', function (event) {
@@ -38,14 +40,29 @@ const birdFlap = function (event) {
 const create = function () {
   this.add.image(0, 0, 'sky').setOrigin(0, 0);
 
+  cloud = this.physics.add.sprite(config.width / 2, 0, 'cloud')
+    .setOrigin(0)
+    .setVelocity(-30, 0)
+
+  cloud2 = this.physics.add.sprite(config.width / 1.1, 100, 'cloud')
+    .setOrigin(0)
+    .setVelocity(-25, 0)
+
+  pipes.push(this.physics.add.sprite(config.width, 300, 'pipe'));
+  pipes.push(this.physics.add.sprite(config.width, -300, 'pipe'));
+
+  pipes.push(this.physics.add.sprite(config.width / 2, 300, 'pipe'));
+  pipes.push(this.physics.add.sprite(config.width / 2, -300, 'pipe'));
+
+  pipes.forEach(pipe => {
+    pipe.setOrigin(0)
+      .setVelocity(-50, 0)
+  });
+
   bird = this.physics.add.sprite(config.width / 10, config.height / 2, 'bird')
     .setOrigin(0)
     .setVelocity(...BIRD_VELOCITY)
     .setGravityY(200);
-
-  cloud = this.physics.add.sprite(config.width / 2, config.height / 3, 'cloud')
-    .setOrigin(1)
-    .setVelocity(-50, 0)
 
   console.log(bird.body);
 
@@ -70,9 +87,21 @@ const update = function (time, delta) {
     bird.setVelocity(...BIRD_VELOCITY);
   }
 
-  if (cloud.x < 0) {
+  if (cloud.x + cloud.width < 0) {
     cloud.x = config.width;
   }
+
+  if (cloud2.x + cloud2.width < 0) {
+    cloud2.x = config.width;
+  }
+
+  // reset the pipe's position to the right of the screen
+  // if they move off the left side
+  pipes.forEach(pipe => {
+    if (pipe.x + pipe.width < 0) {
+      pipe.x = config.width;
+    }
+  });
 
   if (bird.y > config.height) {
     bird.setVelocity(...BIRD_VELOCITY);
@@ -88,7 +117,7 @@ const config = {
   physics: {
     default: 'arcade',
     arcade: {
-      //debug: true,
+      debug: true,
       gravity: {
         //x: -50,
         //y: 200,

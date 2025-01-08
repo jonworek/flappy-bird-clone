@@ -19,7 +19,7 @@ let bird;
 let cloud, cloud2;
 let pipes = [];
 
-const BIRD_VELOCITY = [10, 0];
+const BIRD_VELOCITY = [0, 0];
 
 const birdFlap = function (event) {
   bird.setVelocityY(-150);
@@ -48,10 +48,10 @@ const create = function () {
     .setOrigin(0)
     .setVelocity(-25, 0)
 
-  pipes.push(this.physics.add.sprite(config.width, 300, 'pipe'));
-  pipes.push(this.physics.add.sprite(config.width, -300, 'pipe'));
+  pipes.push(this.physics.add.sprite(config.width, 450, 'pipe'));
+  pipes.push(this.physics.add.sprite(config.width, -200, 'pipe'));
 
-  pipes.push(this.physics.add.sprite(config.width / 2, 300, 'pipe'));
+  pipes.push(this.physics.add.sprite(config.width / 2, 350, 'pipe'));
   pipes.push(this.physics.add.sprite(config.width / 2, -300, 'pipe'));
 
   pipes.forEach(pipe => {

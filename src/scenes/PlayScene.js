@@ -1,4 +1,4 @@
-import Phaser from 'phaser';
+import Phaser from "phaser";
 
 class PlayScene extends Phaser.Scene {
   bird;
@@ -10,7 +10,7 @@ class PlayScene extends Phaser.Scene {
   BIRD_VELOCITY = [0, 0];
 
   constructor(config) {
-    super({ key: 'PlayScene' });
+    super({ key: "PlayScene" });
     this.config = config;
   }
 
@@ -24,6 +24,7 @@ class PlayScene extends Phaser.Scene {
     this.load.image("bird", "assets/bird.png");
     this.load.image("cloud", "assets/cloud.png");
     this.load.image("pipe", "assets/pipe.png");
+    this.load.image("pause-button", "assets/pause.png");
   };
 
   /*
@@ -34,6 +35,8 @@ class PlayScene extends Phaser.Scene {
   create = function () {
     this.add.image(0, 0, "sky").setOrigin(0, 0);
 
+
+    // clouds
     this.cloud = this.physics.add
       .sprite(this.config.width / 2, 0, "cloud")
       .setOrigin(0)
@@ -44,15 +47,16 @@ class PlayScene extends Phaser.Scene {
       .setOrigin(0)
       .setVelocity(-25, 0);
 
+    // pipes
     this.pipes = this.physics.add.group();
 
     // rightmost pipes
-    this.pipes.create(this.config.width * .99, -220, "pipe");  // top
-    this.pipes.create(this.config.width * .99, 450, "pipe");   // bottom
+    this.pipes.create(this.config.width * 0.99, -220, "pipe"); // top
+    this.pipes.create(this.config.width * 0.99, 450, "pipe"); // bottom
 
     // middle pipes
-    this.pipes.create(this.config.width * .66, -200, "pipe");  // top
-    this.pipes.create(this.config.width * .66, 450, "pipe");   // bottom
+    this.pipes.create(this.config.width * 0.66, -200, "pipe"); // top
+    this.pipes.create(this.config.width * 0.66, 450, "pipe"); // bottom
 
     // leftmost pipes
     //this.pipes.create(this.config.width * .33, -100, "pipe");  // top
@@ -60,10 +64,11 @@ class PlayScene extends Phaser.Scene {
 
     this.pipes.children.iterate(function (pipe) {
       pipe.setImmovable(true);
-    })
+    });
 
     this.pipes.setVelocityX(-150);
 
+    // bird
     this.bird = this.physics.add
       .sprite(this.config.width / 10, this.config.height / 2, "bird")
       .setOrigin(0)
@@ -71,11 +76,35 @@ class PlayScene extends Phaser.Scene {
       .setGravityY(200)
       .setCollideWorldBounds(true);
 
+    // collision detection
     this.physics.add.collider(this.bird, this.pipes, this.gameOver, null, this);
 
+    // score
+    this.score = 0;
+    this.scoreText = this.add.text(16, 16, "Score: 0", {
+      fontSize: "32px",
+      fill: "#000",
+      fontWeight: "bold",
+    });
+
+    this.createPauseButton();
+
+    // input events
     this.input.on("pointerdown", this.birdFlap);
     this.input.keyboard.on("keydown-SPACE", this.birdFlap);
   };
+
+  createPauseButton = function () {
+    this.pauseButton = this.add
+      .image(this.config.width - 10, this.config.height - 10, "pause-button")
+      .setOrigin(1)
+      .setScale(3)
+      .setInteractive();
+    this.pauseButton.on("pointerdown", () => {
+      this.scene.pause();
+      this.physics.pause();
+    })
+  }
 
   gameOver = function () {
     this.physics.pause();
@@ -88,7 +117,7 @@ class PlayScene extends Phaser.Scene {
       },
       callbackScope: this,
     });
-  }
+  };
 
   /*
     The update function is called by Phaser at the start of every frame. 
@@ -129,6 +158,8 @@ class PlayScene extends Phaser.Scene {
     // and a random y position
     if (offscreenPipes.length === 2) {
       this.redrawPipes(offscreenPipes);
+      this.score += 1;
+      this.scoreText.setText(`Score: ${this.score}`);
     }
 
     if (bird.getBounds().bottom === config.height) {
@@ -167,8 +198,7 @@ class PlayScene extends Phaser.Scene {
     // Set the y position based on the gap
     top.y = gapMidpoint - gapSize / 2 - top.height / 2;
     bottom.y = gapMidpoint + gapSize / 2 + bottom.height / 2;
-  }
-
+  };
 }
 
 export default PlayScene;

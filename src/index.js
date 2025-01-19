@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import MenuScene from "./scenes/MenuScene";
 import PlayScene from "./scenes/PlayScene";
 
 const dimensions = {
@@ -19,7 +20,10 @@ const config = {
       },
     },
   },
-  scene: new PlayScene(dimensions),
+  scene: [
+    new MenuScene(dimensions),
+    new PlayScene(dimensions),
+  ],
 };
 
 new Phaser.Game(config);

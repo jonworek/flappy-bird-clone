@@ -92,6 +92,10 @@ class PlayScene extends Phaser.Scene {
     // input events
     this.input.on("pointerdown", this.birdFlap);
     this.input.keyboard.on("keydown-SPACE", this.birdFlap);
+
+    this.input.keyboard.on("keydown-ESC", () => {
+      this.scene.start("MenuScene");
+    })
   };
 
   createPauseButton = function () {

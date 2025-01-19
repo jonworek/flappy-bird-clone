@@ -50,12 +50,16 @@ const create = function () {
   pipes = this.physics.add.group();
 
   // rightmost pipes
-  pipes.create(config.width, 450, "pipe");
-  pipes.create(config.width, -200, "pipe");
+  pipes.create(config.width * .99, -220, "pipe");  // top
+  pipes.create(config.width * .99, 450, "pipe");   // bottom
 
   // middle pipes
-  pipes.create(config.width / 2, 550, "pipe");
-  pipes.create(config.width / 2, -100, "pipe");
+  pipes.create(config.width * .66, -200, "pipe");  // top
+  pipes.create(config.width * .66, 450, "pipe");   // bottom
+
+  // leftmost pipes
+  pipes.create(config.width * .33, -100, "pipe");  // top
+  pipes.create(config.width * .33, 550, "pipe");   // bottom
 
   pipes.setVelocityX(-50);
 
@@ -70,6 +74,33 @@ const create = function () {
   this.input.on("pointerdown", birdFlap);
   this.input.keyboard.on("keydown-SPACE", birdFlap);
 };
+
+const redrawPipes = function (offscreenPipes) {
+  let top, bottom;
+  let gapSize = Phaser.Math.Between(150, 250);
+  let gapMidpoint = Phaser.Math.Between(120, 480);
+
+  if (offscreenPipes[0].y > offscreenPipes[1].y) {
+    top = offscreenPipes[0];
+    bottom = offscreenPipes[1];
+  } else {
+    top = offscreenPipes[1];
+    bottom = offscreenPipes[0];
+  }
+
+  // reset to right of the screen
+  top.x = config.width;
+  bottom.x = config.width;
+
+  // pipes are 480px tall, and if the origin is in the center of the sprite,
+  // then there is 240px above and below the origin which means both y positions
+  // must be between -239px and 839px to be on screen
+  // but we'll limit it to -220px and 820px so there's an least 20px of pipe onscreen
+
+  // Set the y position based on the gap
+  top.y = gapMidpoint - gapSize / 2 - top.height / 2;
+  bottom.y = gapMidpoint + gapSize / 2 + bottom.height / 2;
+}
 
 /*
   The update function is called by Phaser at the start of every frame. 
@@ -96,13 +127,21 @@ const update = function (time, delta) {
     cloud2.x = config.width;
   }
 
+  let offscreenPipes = [];
+
   // reset the pipe's position to the right of the screen
   // if they move off the left side
   pipes.children.iterate(function (pipe) {
     if (pipe.x + pipe.width < 0) {
-      pipe.x = config.width;
+      offscreenPipes.push(pipe);
     }
   });
+
+  // the pipes are offscreen, so we can reset them to the rightmost x position,
+  // and a random y position
+  if (offscreenPipes.length === 2) {
+    redrawPipes(offscreenPipes);
+  }
 
   if (bird.y > config.height) {
     bird.setVelocity(...BIRD_VELOCITY);

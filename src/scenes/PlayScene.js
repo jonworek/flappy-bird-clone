@@ -55,20 +55,40 @@ class PlayScene extends Phaser.Scene {
     this.pipes.create(this.config.width * .66, 450, "pipe");   // bottom
 
     // leftmost pipes
-    this.pipes.create(this.config.width * .33, -100, "pipe");  // top
-    this.pipes.create(this.config.width * .33, 550, "pipe");   // bottom
+    //this.pipes.create(this.config.width * .33, -100, "pipe");  // top
+    //this.pipes.create(this.config.width * .33, 550, "pipe");   // bottom
 
-    this.pipes.setVelocityX(-50);
+    this.pipes.children.iterate(function (pipe) {
+      pipe.setImmovable(true);
+    })
+
+    this.pipes.setVelocityX(-150);
 
     this.bird = this.physics.add
       .sprite(this.config.width / 10, this.config.height / 2, "bird")
       .setOrigin(0)
       .setVelocity(...this.BIRD_VELOCITY)
-      .setGravityY(200);
+      .setGravityY(200)
+      .setCollideWorldBounds(true);
+
+    this.physics.add.collider(this.bird, this.pipes, this.gameOver, null, this);
 
     this.input.on("pointerdown", this.birdFlap);
     this.input.keyboard.on("keydown-SPACE", this.birdFlap);
   };
+
+  gameOver = function () {
+    this.physics.pause();
+    this.bird.setTint(0xff0000);
+
+    this.time.addEvent({
+      delay: 1000,
+      callback: function () {
+        this.scene.restart();
+      },
+      callbackScope: this,
+    });
+  }
 
   /*
     The update function is called by Phaser at the start of every frame. 
@@ -111,10 +131,8 @@ class PlayScene extends Phaser.Scene {
       this.redrawPipes(offscreenPipes);
     }
 
-    if (bird.y > config.height) {
-      bird.setVelocity(...this.BIRD_VELOCITY);
-      bird.x = config.width / 10;
-      bird.y = config.height / 2;
+    if (bird.getBounds().bottom === config.height) {
+      this.gameOver();
     }
   };
 

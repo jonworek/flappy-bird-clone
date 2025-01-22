@@ -1,15 +1,17 @@
 import Phaser from "phaser";
+
+import ExitScene from "./scenes/ExitScene";
 import MenuScene from "./scenes/MenuScene";
 import PlayScene from "./scenes/PlayScene";
 
-const dimensions = {
-  width: 800,
+const config = {
+  width: 1000,
   height: 600,
 };
 
-const config = {
+new Phaser.Game({
   type: Phaser.AUTO, // auto is probably going to be WebGL
-  ...dimensions,
+  ...config,
   physics: {
     default: "arcade",
     arcade: {
@@ -21,9 +23,8 @@ const config = {
     },
   },
   scene: [
-    new MenuScene(dimensions),
-    new PlayScene(dimensions),
+    new MenuScene(config),
+    new ExitScene(config),
+    new PlayScene(config),
   ],
-};
-
-new Phaser.Game(config);
+});

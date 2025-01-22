@@ -11,7 +11,6 @@ const config = {
 
 new Phaser.Game({
   type: Phaser.AUTO, // auto is probably going to be WebGL
-  ...config,
   physics: {
     default: "arcade",
     arcade: {
@@ -27,4 +26,6 @@ new Phaser.Game({
     new ExitScene(config),
     new PlayScene(config),
   ],
+  parent: "game-container",
+  ...config,
 });

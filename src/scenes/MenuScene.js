@@ -25,8 +25,17 @@ class MenuScene extends Phaser.Scene {
       fill: '#ffffff'
     });
 
+    const exitText = this.add.text(100, 300, 'Press "E" to Exit', {
+      font: '24px Arial',
+      fill: '#ffffff'
+    });
+
     this.input.keyboard.on('keydown-S', () => {
       this.scene.start('PlayScene');
+    });
+
+    this.input.keyboard.on('keydown-E', () => {
+      this.scene.start('ExitScene');
     });
   }
 

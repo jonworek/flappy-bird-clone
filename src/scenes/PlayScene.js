@@ -33,8 +33,14 @@ class PlayScene extends Phaser.Scene {
     In this case, we are creating a sprite with the sky image.
   */
   create = function () {
-    this.add.image(0, 0, "sky").setOrigin(0, 0);
+    // Create a graphics object
+    const graphics = this.add.graphics();
 
+    // Define the gradient colors
+    graphics.fillGradientStyle(0x87CEEB, 0x87CEEB, 0xFFFFFF, 0xFFFFFF, 1);
+
+    // Fill the background with the gradient
+    graphics.fillRect(0, 0, this.config.width, this.config.height);
 
     // clouds
     this.cloud = this.physics.add
@@ -59,8 +65,8 @@ class PlayScene extends Phaser.Scene {
     this.pipes.create(this.config.width * 0.66, 450, "pipe"); // bottom
 
     // leftmost pipes
-    //this.pipes.create(this.config.width * .33, -100, "pipe");  // top
-    //this.pipes.create(this.config.width * .33, 550, "pipe");   // bottom
+    this.pipes.create(this.config.width * .33, -100, "pipe");  // top
+    this.pipes.create(this.config.width * .33, 550, "pipe");   // bottom
 
     this.pipes.children.iterate(function (pipe) {
       pipe.setImmovable(true);

@@ -17,6 +17,7 @@ new Phaser.Game({
     touch: true,
     gamepad: true,
   },
+  pixelArt: true,
   physics: {
     default: "arcade",
     arcade: {

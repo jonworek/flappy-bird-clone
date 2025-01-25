@@ -21,7 +21,10 @@ class PlayScene extends Phaser.Scene {
   */
   preload = function () {
     this.load.image("sky", "assets/sky.png");
-    this.load.image("bird", "assets/bird.png");
+    this.load.spritesheet("bird", "assets/birdSprite.png", {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
     this.load.image("cloud", "assets/cloud.png");
     this.load.image("pipe", "assets/pipe.png");
     this.load.image("pause-button", "assets/pause.png");
@@ -33,14 +36,10 @@ class PlayScene extends Phaser.Scene {
     In this case, we are creating a sprite with the sky image.
   */
   create = function () {
-    // Create a graphics object
-    const graphics = this.add.graphics();
-
-    // Define the gradient colors
-    graphics.fillGradientStyle(0x87CEEB, 0x87CEEB, 0xFFFFFF, 0xFFFFFF, 1);
-
-    // Fill the background with the gradient
-    graphics.fillRect(0, 0, this.config.width, this.config.height);
+    // sky background
+    this.add.graphics()
+      .fillGradientStyle(0x87CEEB, 0x87CEEB, 0xFFFFFF, 0xFFFFFF, 1)
+      .fillRect(0, 0, this.config.width, this.config.height);
 
     // clouds
     this.cloud = this.physics.add
@@ -53,6 +52,45 @@ class PlayScene extends Phaser.Scene {
       .setOrigin(0)
       .setVelocity(-25, 0);
 
+    this.createPipes();
+
+    // bird
+    this.bird = this.physics.add
+      .sprite(this.config.width / 10, this.config.height / 2, "bird")
+      .setOrigin(0)
+      .setFlipX(true)
+      .setVelocity(...this.BIRD_VELOCITY)
+      .setGravityY(200)
+      .setScale(3)
+      .setCollideWorldBounds(true);
+
+    this.bird.body.setSize(16, 9);
+
+    this.anims.create({
+      key: "fly",
+      frames: this.anims.generateFrameNumbers("bird", { start: 8, end: 15 }),
+      frameRate: 8,  // 8 frames per second
+      repeat: -1, // repeat forever
+    });
+
+    this.bird.anims.play("fly");
+
+    // collision detection
+    this.physics.add.collider(this.bird, this.pipes, this.gameOver, null, this);
+
+    // score
+    this.score = 0;
+    this.scoreText = this.add.text(16, 16, "Score: 0", {
+      fontSize: "32px",
+      fill: "#000",
+      fontWeight: "bold",
+    });
+
+    this.createPauseButton();
+    this.createInputListeners();
+  };
+
+  createPipes = function () {
     // pipes
     this.pipes = this.physics.add.group();
 
@@ -73,28 +111,6 @@ class PlayScene extends Phaser.Scene {
     });
 
     this.pipes.setVelocityX(-150);
-
-    // bird
-    this.bird = this.physics.add
-      .sprite(this.config.width / 10, this.config.height / 2, "bird")
-      .setOrigin(0)
-      .setVelocity(...this.BIRD_VELOCITY)
-      .setGravityY(200)
-      .setCollideWorldBounds(true);
-
-    // collision detection
-    this.physics.add.collider(this.bird, this.pipes, this.gameOver, null, this);
-
-    // score
-    this.score = 0;
-    this.scoreText = this.add.text(16, 16, "Score: 0", {
-      fontSize: "32px",
-      fill: "#000",
-      fontWeight: "bold",
-    });
-
-    this.createPauseButton();
-    this.createInputListeners();
   };
 
   createPauseButton = function () {

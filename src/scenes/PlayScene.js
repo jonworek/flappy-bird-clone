@@ -94,14 +94,7 @@ class PlayScene extends Phaser.Scene {
     });
 
     this.createPauseButton();
-
-    // input events
-    this.input.on("pointerdown", this.birdFlap);
-    this.input.keyboard.on("keydown-SPACE", this.birdFlap);
-
-    this.input.keyboard.on("keydown-ESC", () => {
-      this.scene.start("MenuScene");
-    })
+    this.createInputListeners();
   };
 
   createPauseButton = function () {
@@ -110,10 +103,38 @@ class PlayScene extends Phaser.Scene {
       .setOrigin(1)
       .setScale(3)
       .setInteractive();
+
     this.pauseButton.on("pointerdown", () => {
       this.scene.pause();
       this.physics.pause();
     })
+  }
+
+  createInputListeners = function () {
+    // input events
+    this.input.on("pointerdown", () => {
+      this.birdFlap();
+    })
+    this.input.keyboard.on("keydown-SPACE", () => {
+      this.birdFlap()
+    });
+
+    this.input.keyboard.on("keydown-ESC", () => {
+      this.scene.start("MenuScene");
+    })
+
+    this.input.gamepad.on("down", (gamepad, button, value) => {
+      switch (button.index) {
+        case 0: // A button (Xbox controller) / Cross button (PlayStation controller)
+          this.birdFlap();
+          break;
+        case 9: // Start button
+          this.scene.start("ExitScene");
+          break;
+        default:
+          break;
+      }
+    });
   }
 
   gameOver = function () {
@@ -177,8 +198,8 @@ class PlayScene extends Phaser.Scene {
     }
   };
 
-  birdFlap = function (event) {
-    this.scene.bird.setVelocityY(-150);
+  birdFlap(event) {
+    this.bird.setVelocityY(-150);
   };
 
   redrawPipes = function (offscreenPipes) {

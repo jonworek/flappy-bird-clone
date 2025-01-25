@@ -11,6 +11,12 @@ const config = {
 
 new Phaser.Game({
   type: Phaser.AUTO, // auto is probably going to be WebGL
+  input: {
+    keyboard: true,
+    mouse: true,
+    touch: true,
+    gamepad: true,
+  },
   physics: {
     default: "arcade",
     arcade: {

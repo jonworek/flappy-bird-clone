@@ -30,7 +30,7 @@ class ExitScene extends Phaser.Scene {
     });
 
     this.input.keyboard.on('keydown-N', () => {
-      this.scene.start('MenuScene');
+      this.scene.start('PlayScene');
     });
   }
 
